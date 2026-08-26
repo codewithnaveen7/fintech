@@ -1,0 +1,33 @@
+# Markdown
+*.md
+
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Coverage / test
+coverage/
+.nyc_output/
+
+# Build
+dist/
+build/
