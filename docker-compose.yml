@@ -44,6 +44,35 @@ services:
     networks:
       - fintech_network
 
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: fintech_app
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: ${MYSQL_USER:-fintech_user}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      DB_NAME: ${MYSQL_DATABASE:-fintech_wallet}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+    ports:
+      - "3000:3000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    networks:
+      - fintech_network
+
   phpmyadmin:
     image: phpmyadmin:5
     container_name: fintech_phpmyadmin
