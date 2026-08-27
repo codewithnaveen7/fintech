@@ -1,6 +1,6 @@
 'use strict';
 
-const { Wallet } = require('../../models');
+const { Wallet, LedgerEntry } = require('../../models');
 const { addMoney } = require('../services/wallet');
 
 async function getBalance(req, res) {
@@ -35,4 +35,26 @@ async function addMoneyToWallet(req, res) {
   res.json(result.data);
 }
 
-module.exports = { getBalance, addMoneyToWallet };
+async function getStatement(req, res) {
+  const entries = await LedgerEntry.findAll({
+    where: { user_id: req.user.id },
+    order: [['createdAt', 'DESC']],
+  });
+
+  const statement = entries.map((row) => ({
+    transaction_id: row.transaction_id,
+    transaction_type: row.transaction_type,
+    debit: row.debit,
+    credit: row.credit,
+    opening_balance: row.opening_balance,
+    closing_balance: row.closing_balance,
+    reference_type: row.reference_type,
+    reference_id: row.reference_id,
+    metadata: row.metadata,
+    created_at: row.createdAt,
+  }));
+
+  res.json({ statement });
+}
+
+module.exports = { getBalance, addMoneyToWallet, getStatement };
