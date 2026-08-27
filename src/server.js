@@ -11,6 +11,8 @@ const authRoutes = require('./routes/auth');
 const walletRoutes = require('./routes/wallet');
 const productRoutes = require('./routes/product');
 const orderRoutes = require('./routes/order');
+const withdrawalRoutes = require('./routes/withdrawal');
+const adminRoutes = require('./routes/admin');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -25,6 +27,8 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/wallet', walletRoutes);
 app.use('/api/v1/products', productRoutes);
 app.use('/api/v1/orders', orderRoutes);
+app.use('/api/v1/withdrawals', withdrawalRoutes);
+app.use('/api/v1/admin', adminRoutes);
 
 sequelize.authenticate().then(() => {
   app.listen(port, () => {
