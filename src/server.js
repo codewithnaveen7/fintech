@@ -30,6 +30,11 @@ app.use('/api/v1/orders', orderRoutes);
 app.use('/api/v1/withdrawals', withdrawalRoutes);
 app.use('/api/v1/admin', adminRoutes);
 
+app.use((err, req, res, next) => {
+  console.error(req.method, req.originalUrl, err.message);
+  res.status(500).json({ message: 'something went wrong' });
+});
+
 sequelize.authenticate().then(() => {
   app.listen(port, () => {
     console.log('listening on', port);
