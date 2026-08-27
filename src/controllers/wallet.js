@@ -1,6 +1,7 @@
 'use strict';
 
 const { Wallet } = require('../../models');
+const { addMoney } = require('../services/wallet');
 
 async function getBalance(req, res) {
   const wallet = await Wallet.findOne({ where: { user_id: req.user.id } });
@@ -14,4 +15,24 @@ async function getBalance(req, res) {
   });
 }
 
-module.exports = { getBalance };
+async function addMoneyToWallet(req, res) {
+  const amount = req.body.amount;
+  const idempotencyKey = (req.headers['idempotency-key'] || '').trim();
+
+  if (!idempotencyKey) {
+    return res.status(400).json({ message: 'Idempotency-Key header is required' });
+  }
+
+  if (amount == null || Number(amount) <= 0 || Number.isNaN(Number(amount))) {
+    return res.status(400).json({ message: 'amount must be greater than 0' });
+  }
+
+  const result = await addMoney(req.user.id, amount, idempotencyKey);
+  if (!result.ok) {
+    return res.status(result.status).json({ message: result.message });
+  }
+
+  res.json(result.data);
+}
+
+module.exports = { getBalance, addMoneyToWallet };
