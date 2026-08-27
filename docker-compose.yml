@@ -21,6 +21,29 @@ services:
     networks:
       - fintech_network
 
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: migrate
+    container_name: fintech_migrate
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: ${MYSQL_USER:-fintech_user}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      DB_NAME: ${MYSQL_DATABASE:-fintech_wallet}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    command: ["sh", "-c", "npx sequelize-cli db:migrate && npx sequelize-cli db:seed:all"]
+    restart: "no"
+    networks:
+      - fintech_network
+
   phpmyadmin:
     image: phpmyadmin:5
     container_name: fintech_phpmyadmin
@@ -34,6 +57,8 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     networks:
       - fintech_network
 
